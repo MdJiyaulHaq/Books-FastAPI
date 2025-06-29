@@ -71,3 +71,10 @@ async def update_book(updated_book=Body()):
         if Books[i].get("id") == updated_book.get("id"):
             Books[i] = updated_book
     return {"book updated successfully"}
+
+
+@app.delete("/books/{pk}/delete")
+async def delete_book(pk: int):
+    if Books[pk].get("id"):
+        Books.pop(pk)
+    return {"book deleted successfully"}
