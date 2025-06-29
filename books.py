@@ -12,13 +12,15 @@ class Book:
     author: str
     description: str
     rating: int
+    published_date: int
 
-    def __init__(self, id, title, author, description, rating) -> None:
+    def __init__(self, id, title, author, description, rating, published_date) -> None:
         self.id = id
         self.title = title
         self.author = author
         self.description = description
         self.rating = rating
+        self.published_date = published_date
 
 
 class BookRequest(BaseModel):
@@ -29,6 +31,7 @@ class BookRequest(BaseModel):
     author: str = Field(max_length=100, min_length=3)
     description: str = Field(max_length=255, min_length=5)
     rating: int = Field(ge=0, le=10)
+    published_date: int = Field(ge=1999, le=2025)
 
     model_config = {
         "json_schema_extra": {
@@ -37,16 +40,17 @@ class BookRequest(BaseModel):
                 "author": "Md",
                 "description": "A detailed description of the book.",
                 "rating": 9,
+                "published_date": 2020,
             }
         }
     }
 
 
 Books = [
-    Book(1, "The Forty Rules of Love", "Elif Shafak", "Literary Fiction", 6),
-    Book(2, "A Court of Thorns and Roses", "Sarah J. Maas", "Romance", 5),
-    Book(3, "The Hobbit", "J. Tolkien", "Fantasy", 7),
-    Book(4, "Pride and Prejudice", "Jane Austen", "Fiction", 6),
+    Book(1, "The Forty Rules of Love", "Elif Shafak", "Literary Fiction", 6, 2012),
+    Book(2, "A Court of Thorns and Roses", "Sarah J. Maas", "Romance", 5, 2009),
+    Book(3, "The Hobbit", "J. Tolkien", "Fantasy", 7, 1999),
+    Book(4, "Pride and Prejudice", "Jane Austen", "Fiction", 6, 2024),
 ]
 
 
