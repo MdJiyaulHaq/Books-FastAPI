@@ -1,5 +1,5 @@
 from typing import Optional
-from fastapi import Body, FastAPI
+from fastapi import Body, FastAPI, Path
 from pydantic import BaseModel, Field
 from fastapi import Query
 
@@ -80,7 +80,7 @@ async def get_book_by_query_params(
 
 
 @app.get("/books/{pk}")
-async def get_book_by_id(pk: int):
+async def get_book_by_id(pk: int = Path(gt=0)):
     for book in Books:
         if book.id == pk:
             return book
@@ -111,7 +111,7 @@ async def update_book(book: BookRequest):
 
 
 @app.delete("/books/{pk}")
-async def delete_book(pk: int):
+async def delete_book(pk: int = Path(gt=0)):
     for i in range(len(Books)):
         if Books[i].id == pk:
             Books.pop(i)
