@@ -57,7 +57,7 @@ Books = [
 async def get_book_by_query_params(
     description: Optional[str] = Query(None),
     author: Optional[str] = Query(None),
-    rating: Optional[int] = Query(ge=0, le=10),
+    rating: Optional[int] = Query(None, ge=0, le=10),
 ):
     querried_books = []
     for book in Books:
