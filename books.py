@@ -53,7 +53,7 @@ Books = [
 ]
 
 
-@app.get("/books/")
+@app.get("/books/", status_code=status.HTTP_200_OK)
 async def get_book_by_query_params(
     description: Optional[str] = Query(None),
     author: Optional[str] = Query(None),
@@ -78,7 +78,7 @@ async def get_book_by_query_params(
     return querried_books
 
 
-@app.get("/books/{pk}")
+@app.get("/books/{pk}", status_code=status.HTTP_200_OK)
 async def get_book_by_id(pk: int = Path(gt=0)):
     for book in Books:
         if book.id == pk:
@@ -86,11 +86,10 @@ async def get_book_by_id(pk: int = Path(gt=0)):
     raise HTTPException(status_code=404, detail="Item not found")
 
 
-@app.post("/books/create")
+@app.post("/books/create", status_code=status.HTTP_201_CREATED)
 async def create_book(book_request: BookRequest):
     new_book = Book(**book_request.model_dump())
     Books.append(find_book_id(new_book))
-    return status.HTTP_201_CREATED
 
 
 def find_book_id(book: Book):
@@ -101,7 +100,7 @@ def find_book_id(book: Book):
     return book
 
 
-@app.put("/books/update")
+@app.put("/books/update", status_code=status.HTTP_204_NO_CONTENT)
 async def update_book(book: BookRequest):
     book_updated = False
     for i in range(len(Books)):
@@ -110,13 +109,15 @@ async def update_book(book: BookRequest):
             book_updated = True
     if not book_updated:
         raise HTTPException(status_code=404, detail="Item not found")
-    return status.HTTP_200_OK
 
 
-@app.delete("/books/{pk}")
+@app.delete("/books/{pk}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(pk: int = Path(gt=0)):
+    book_deleted = False
     for i in range(len(Books)):
         if Books[i].id == pk:
             Books.pop(i)
+            book_deleted = True
             break
-    return status.HTTP_404_NOT_FOUND
+    if not book_deleted:
+        raise HTTPException(status_code=404, detail="Item not found")
