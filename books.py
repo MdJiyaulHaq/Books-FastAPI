@@ -106,8 +106,10 @@ async def update_book(book: BookRequest):
     return {"book updated successfully"}
 
 
-@app.delete("/books/{pk}/delete")
+@app.delete("/books/{pk}")
 async def delete_book(pk: int):
-    if Books[pk].get("id"):
-        Books.pop(pk)
+    for i in range(len(Books)):
+        if Books[i].id == pk:
+            Books.pop(i)
+            break
     return {"book deleted successfully"}
