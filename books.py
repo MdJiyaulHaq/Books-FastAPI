@@ -1,4 +1,6 @@
+from typing import Optional
 from fastapi import Body, FastAPI
+from pydantic import BaseModel, Field
 
 app = FastAPI()
 
@@ -16,6 +18,14 @@ class Book:
         self.author = author
         self.description = description
         self.rating = rating
+
+
+class BookRequest(BaseModel):
+    id: Optional[int] = None
+    title: str = Field(max_length=100, min_length=3)
+    author: str = Field(max_length=100, min_length=3)
+    description: str = Field(max_length=255, min_length=5)
+    rating: int = Field(ge=0, le=10)
 
 
 Books = [
@@ -56,9 +66,18 @@ async def get_book_by_query_params(category: str, author: str):
 
 
 @app.post("/books/create")
-async def create_book(new_book=Body()):
-    Books.append(new_book)
+async def create_book(book_request: BookRequest):
+    new_book = Book(**book_request.model_dump())
+    Books.append(find_book_id(new_book))
     return {"book added successfully"}
+
+
+def find_book_id(book: Book):
+    if len(Books) > 0:
+        book.id = Books[-1].id + 1
+    else:
+        book.id = 1
+    return book
 
 
 @app.put("/books/update")
