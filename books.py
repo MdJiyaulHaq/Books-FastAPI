@@ -2,31 +2,27 @@ from fastapi import Body, FastAPI
 
 app = FastAPI()
 
+
+class Book:
+    id: int
+    title: str
+    author: str
+    description: str
+    rating: int
+
+    def __init__(self, id, title, author, description, rating) -> None:
+        self.id = id
+        self.title = title
+        self.author = author
+        self.description = description
+        self.rating = rating
+
+
 Books = [
-    {
-        "id": 1,
-        "title": "The Forty Rules of Love",
-        "author": "Elif Shafak",
-        "category": "Literary Fiction",
-    },
-    {
-        "id": 2,
-        "title": "A Court of Thorns and Roses",
-        "author": "Sarah J. Maas",
-        "category": "Romance",
-    },
-    {
-        "id": 3,
-        "title": "The Hobbit",
-        "author": "J. Tolkien",
-        "category": "Fantasy",
-    },
-    {
-        "id": 4,
-        "title": "Pride and Prejudice",
-        "author": "Jane Austen",
-        "category": "Fiction",
-    },
+    Book(1, "The Forty Rules of Love", "Elif Shafak", "Literary Fiction", 6),
+    Book(2, "A Court of Thorns and Roses", "Sarah J. Maas", "Romance", 5),
+    Book(3, "The Hobbit", "J. Tolkien", "Fantasy", 7),
+    Book(4, "Pride and Prejudice", "Jane Austen", "Fiction", 6),
 ]
 
 
