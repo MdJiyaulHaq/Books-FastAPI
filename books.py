@@ -1,6 +1,7 @@
 from typing import Optional
 from fastapi import Body, FastAPI
 from pydantic import BaseModel, Field
+from fastapi import Query
 
 app = FastAPI()
 
@@ -49,9 +50,29 @@ Books = [
 ]
 
 
-@app.get("/books")
-async def get_books():
-    return Books
+@app.get("/books/")
+async def get_book_by_query_params(
+    description: Optional[str] = Query(None),
+    author: Optional[str] = Query(None),
+    rating: Optional[int] = Query(None),
+):
+    querried_books = []
+    for book in Books:
+        if (
+            (rating is None or book.rating == rating)
+            and (
+                author is None or book.author.lower() == author.lower()
+                if author
+                else True
+            )
+            and (
+                description is None or book.description.lower() == description.lower()
+                if description
+                else True
+            )
+        ):
+            querried_books.append(book)
+    return querried_books
 
 
 @app.get("/books/{pk}")
@@ -60,22 +81,6 @@ async def get_book_by_id(pk: int):
         if book.id == pk:
             return book
     return {"error": "Book not found"}
-
-
-@app.get("/books/")
-async def get_book_by_query_params(category: str, author: str):
-    querried_books = []
-    for book in Books:
-        category_value = book.get("category")
-        author_value = book.get("author")
-        if (
-            category_value is not None
-            and author_value is not None
-            and category_value.casefold() == category.casefold()
-            and author_value.casefold() == author.casefold()
-        ):
-            querried_books.append(book)
-    return querried_books
 
 
 @app.post("/books/create")
