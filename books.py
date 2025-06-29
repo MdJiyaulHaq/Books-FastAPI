@@ -63,3 +63,11 @@ async def get_book_by_query_params(category: str, author: str):
 async def create_book(new_book=Body()):
     Books.append(new_book)
     return {"book added successfully"}
+
+
+@app.put("/books/update")
+async def update_book(updated_book=Body()):
+    for i in range(len(Books)):
+        if Books[i].get("id") == updated_book.get("id"):
+            Books[i] = updated_book
+    return {"book updated successfully"}
