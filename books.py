@@ -99,10 +99,10 @@ def find_book_id(book: Book):
 
 
 @app.put("/books/update")
-async def update_book(updated_book=Body()):
+async def update_book(book: BookRequest):
     for i in range(len(Books)):
-        if Books[i].get("id") == updated_book.get("id"):
-            Books[i] = updated_book
+        if Books[i].id == book.id:
+            Books[i] = Book(**book.model_dump())
     return {"book updated successfully"}
 
 
