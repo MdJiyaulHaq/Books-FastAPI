@@ -158,24 +158,28 @@ async def create_book(
 async def update_book(
     db: db_dependency, user: user_dependency, book: BookRequest, id: int = Path(gt=0)
 ):
-    query = db.query(Book).filter(
-        getattr(Book, "id") == id, Book.owner_id == user["id"]
-    )
-    book_to_update = query.first()
-    if book_to_update:
-        for key, value in book.model_dump().items():
-            setattr(book_to_update, key, value)
-        db.commit()
-        return
-    raise HTTPException(status_code=404, detail="Item not found")
+    query = db.query(Book).filter(Book.id == id, Book.owner_id == user["id"]).first()
+    if query is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    else:
+        setattr(query, "title", book.title)
+        setattr(query, "description", book.description)
+        setattr(query, "author", book.author)
+        setattr(query, "published_date", book.published_date)
+        setattr(query, "rating", book.rating)
+        setattr(query, "owner_id", user["id"])
+    db.add(query)
+    db.commit()
+    return status.HTTP_200_OK
 
 
 @router.delete("/book/{pk}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(user: user_dependency, db: db_dependency, pk: int = Path(gt=0)):
-    query = db.query(Book).filter(getattr(Book, "id") == pk)
-    book_to_delete = query.first()
-    if book_to_delete:
-        db.delete(book_to_delete)
+    query = db.query(Book).filter(Book.id == pk, Book.owner_id == user["id"]).first()
+    if query is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    else:
+        db.query(Book).filter(Book.id == pk).delete()
         db.commit()
-        return
-    raise HTTPException(status_code=404, detail="Item not found")
+
+    return status.HTTP_204_NO_CONTENT

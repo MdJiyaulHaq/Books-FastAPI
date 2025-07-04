@@ -12,7 +12,7 @@ if (bookForm) {
             title: data.title,
             description: data.description,
             author: data.author,
-            published_date: data.published_date,
+            published_date: parseInt(data.published_date),
             rating: parseInt(data.rating),
         };
 
@@ -55,7 +55,7 @@ if (editbookForm) {
             title: data.title,
             description: data.description,
             author: data.author,
-            published_date: data.published_date,
+            published_date: parseInt(data.published_date),
             rating: parseInt(data.rating),
         };
 
