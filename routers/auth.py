@@ -54,7 +54,7 @@ def authenticate_user(db: Session, username: str, password: str):
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_bearer = OAuth2PasswordBearer(tokenUrl="auth/token")
 
-SECRET_KEY = ")7vv&q)!f+*xf)*hpb^qv*&nx%=ip0^nk0xb1vty&07as1n1l0"
+SECRET_KEY = "=4uct&lled6@n_rha6w3piw#bsjzjwpy%!5gqdnw=cihq4=c8@"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
