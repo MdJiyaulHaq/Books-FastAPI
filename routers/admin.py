@@ -23,8 +23,8 @@ db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
-@router.get("/admin/todo/", status_code=status.HTTP_200_OK)
-async def get_all_todos(user: user_dependency, db: db_dependency):
+@router.get("/admin/books/", status_code=status.HTTP_200_OK)
+async def get_all_books(user: user_dependency, db: db_dependency):
     if user["role"] != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
@@ -32,8 +32,8 @@ async def get_all_todos(user: user_dependency, db: db_dependency):
     return db.query(Book).all()
 
 
-@router.get("/admin/todo/{id}", status_code=status.HTTP_200_OK)
-async def get_todo(user: user_dependency, db: db_dependency, id: int = Path(gt=0)):
+@router.get("/admin/books/{id}", status_code=status.HTTP_200_OK)
+async def get_book(user: user_dependency, db: db_dependency, id: int = Path(gt=0)):
     if user["role"] != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
@@ -45,8 +45,8 @@ async def get_todo(user: user_dependency, db: db_dependency, id: int = Path(gt=0
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@router.delete("/admin/todo/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_todo(user: user_dependency, db: db_dependency, id: int = Path(gt=0)):
+@router.delete("/admin/books/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_book(user: user_dependency, db: db_dependency, id: int = Path(gt=0)):
     if user["role"] != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN, detail="Access denied"
