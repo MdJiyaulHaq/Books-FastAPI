@@ -15,6 +15,7 @@ from .auth import get_current_user
 templates = Jinja2Templates(directory="templates")
 router = APIRouter(
     tags=["books"],
+    prefix="/books",
 )
 
 
