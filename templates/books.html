@@ -1,0 +1,36 @@
+{% include "layout.html" %}
+<div class="container">
+    <div class="card text-center">
+        <div class="card-header">
+            <h1>Book List</h1>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">
+                Information about Books.
+            </h5>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">S.N.</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                    <tr class="pointer">
+                        <td>{{ loop.index }}</td>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.description }}</td>
+                        <td>
+                            <button onclick="window.location.href='edit-book-page/{{ book.id }}'" type="button"
+                                class="btn btn-info">Edit</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <a href="/books/add-book-page" class="btn btn-primary">Add a new Book</a>
+        </div>
+    </div>

@@ -13,6 +13,9 @@ from sqlalchemy.orm import Session
 from .auth import get_current_user
 
 templates = Jinja2Templates(directory="templates")
+router = APIRouter(
+    tags=["books"],
+)
 
 
 def get_db():
@@ -25,12 +28,6 @@ def get_db():
 
 db_dependency = Annotated[Session, Depends(get_db)]
 user_dependency = Annotated[dict, Depends(get_current_user)]
-
-app = FastAPI()
-
-router = APIRouter(
-    tags=["books"],
-)
 
 
 class BookRequest(BaseModel):
@@ -56,7 +53,67 @@ class BookRequest(BaseModel):
     }
 
 
-@app.get("/books/", status_code=status.HTTP_200_OK)
+def redirect_to_login():
+    redirect_response = RedirectResponse(url="/auth/login-page")
+    redirect_response.delete_cookie(key="access_token")
+    return redirect_response
+
+
+# Book pages
+@router.get("/book-page")
+async def book_page(request: Request, db: db_dependency):
+    access_token = request.cookies.get("access_token")
+    if not access_token:
+        return redirect_to_login()
+    try:
+        user = await get_current_user(access_token)
+        if user is None:
+            return redirect_to_login()
+        books = db.query(Book).filter(Book.owner_id == user["id"]).all()
+        return templates.TemplateResponse(
+            "book.html", {"request": request, "books": books, "user": user}
+        )
+    except Exception:
+        return redirect_to_login()
+
+
+@router.get("/add-book-page")
+async def add_book_page(request: Request, db: db_dependency):
+    access_token = request.cookies.get("access_token")
+    if not access_token:
+        return redirect_to_login()
+    try:
+        user = await get_current_user(access_token)
+        if user is None:
+            return redirect_to_login()
+        return templates.TemplateResponse(
+            "add-book.html", {"request": request, "user": user}
+        )
+    except Exception:
+        return redirect_to_login()
+
+
+@router.get("/edit-book-page/{id}")
+async def edit_book_page(request: Request, db: db_dependency, id: int = Path(gt=0)):
+    access_token = request.cookies.get("access_token")
+    if not access_token:
+        return redirect_to_login()
+    try:
+        user = await get_current_user(access_token)
+        if user is None:
+            return redirect_to_login()
+        book = db.query(Book).filter(Book.id == id, Book.owner_id == user["id"]).first()
+        if book is None:
+            return redirect_to_login()
+        return templates.TemplateResponse(
+            "edit-book.html", {"request": request, "user": user, "book": book}
+        )
+    except Exception:
+        return redirect_to_login()
+
+
+# Book endpoints
+@router.get("/books/", status_code=status.HTTP_200_OK)
 async def get_book_by_query_params(
     user: user_dependency,
     db: db_dependency,
@@ -75,7 +132,7 @@ async def get_book_by_query_params(
     return books
 
 
-@app.get("/books/{pk}", status_code=status.HTTP_200_OK)
+@router.get("/books/{pk}", status_code=status.HTTP_200_OK)
 async def get_book_by_id(
     db: db_dependency, user: user_dependency, pk: int = Path(gt=0)
 ):
@@ -86,7 +143,7 @@ async def get_book_by_id(
     raise HTTPException(status_code=404, detail="Item not found")
 
 
-@app.post("/books/create", status_code=status.HTTP_201_CREATED)
+@router.post("/books/create", status_code=status.HTTP_201_CREATED)
 async def create_book(
     book_request: BookRequest, db: db_dependency, user: user_dependency
 ):
@@ -97,7 +154,7 @@ async def create_book(
     return new_book
 
 
-@app.put("/books/update", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("/books/update", status_code=status.HTTP_204_NO_CONTENT)
 async def update_book(book: BookRequest, db: db_dependency, user: user_dependency):
     query = db.query(Book).filter(getattr(Book, "id") == book.id)
     book_to_update = query.first()
@@ -109,7 +166,7 @@ async def update_book(book: BookRequest, db: db_dependency, user: user_dependenc
     raise HTTPException(status_code=404, detail="Item not found")
 
 
-@app.delete("/books/{pk}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/books/{pk}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(user: user_dependency, db: db_dependency, pk: int = Path(gt=0)):
     query = db.query(Book).filter(getattr(Book, "id") == pk)
     book_to_delete = query.first()
