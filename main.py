@@ -7,12 +7,10 @@ from routers import admin, auth, books, users
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    return RedirectResponse(url="/books", status_code=status.HTTP_302_FOUND)
+    return RedirectResponse(url="/docs", status_code=status.HTTP_302_FOUND)
 
 
 models.Base.metadata.create_all(bind=engine)

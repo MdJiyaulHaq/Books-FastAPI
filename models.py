@@ -26,14 +26,3 @@ class Book(Base):
     rating = Column(Integer)
     published_date = Column(Date)
     author_id = Column(Integer, ForeignKey("users.id"))
-
-    def __init__(
-        self, id, title, author, description, rating, published_date, author_id
-    ) -> None:
-        self.id = id
-        self.title = title
-        self.author = author
-        self.description = description
-        self.rating = rating
-        self.published_date = published_date
-        self.author_id = author_id
