@@ -25,4 +25,4 @@ class Book(Base):
     description = Column(String)
     rating = Column(Integer)
     published_date = Column(Date)
-    author_id = Column(Integer, ForeignKey("users.id"))
+    owner_id = Column(Integer, ForeignKey("users.id"))
