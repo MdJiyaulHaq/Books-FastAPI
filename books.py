@@ -1,25 +1,9 @@
 from typing import Optional
 from fastapi import Body, Path, Query, HTTPException, status, FastAPI
 from pydantic import BaseModel, Field
+from models import Book
 
 app = FastAPI()
-
-
-class Book:
-    id: int
-    title: str
-    author: str
-    description: str
-    rating: int
-    published_date: int
-
-    def __init__(self, id, title, author, description, rating, published_date) -> None:
-        self.id = id
-        self.title = title
-        self.author = author
-        self.description = description
-        self.rating = rating
-        self.published_date = published_date
 
 
 class BookRequest(BaseModel):

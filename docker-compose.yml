@@ -4,3 +4,17 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
+    depends_on:
+      - db
+
+  db:
+    image: postgres:17-alpine
+    volumes:
+      - dev_db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: bookdatabase
+      POSTGRES_USER: bookuser
+      POSTGRES_PASSWORD: mypassword
+
+volumes:
+  dev_db_data:
