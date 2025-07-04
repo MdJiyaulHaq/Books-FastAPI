@@ -11,8 +11,9 @@ if (bookForm) {
         const payload = {
             title: data.title,
             description: data.description,
-            priority: parseInt(data.priority),
-            completed: false
+            author: data.author,
+            published_date: data.published_date,
+            rating: parseInt(data.rating),
         };
 
         try {
@@ -53,8 +54,9 @@ if (editbookForm) {
         const payload = {
             title: data.title,
             description: data.description,
-            priority: parseInt(data.priority),
-            completed: data.completed === "on"
+            author: data.author,
+            published_date: data.published_date,
+            rating: parseInt(data.rating),
         };
 
         try {

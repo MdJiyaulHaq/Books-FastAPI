@@ -32,9 +32,6 @@ user_dependency = Annotated[dict, Depends(get_current_user)]
 
 
 class BookRequest(BaseModel):
-    id: Optional[int] = Field(
-        description="Id is not required while creating a book.", default=None
-    )
     title: str = Field(max_length=100, min_length=3)
     author: str = Field(max_length=100, min_length=3)
     description: str = Field(max_length=255, min_length=5)
@@ -144,20 +141,26 @@ async def get_book_by_id(
     raise HTTPException(status_code=404, detail="Item not found")
 
 
-@router.post("/books/create", status_code=status.HTTP_201_CREATED)
+@router.post("/book/", status_code=status.HTTP_201_CREATED)
 async def create_book(
     book_request: BookRequest, db: db_dependency, user: user_dependency
 ):
-    new_book = Book(**book_request.model_dump())
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
+    new_book = Book(**book_request.model_dump(), owner_id=user["id"])
     db.add(new_book)
     db.commit()
     db.refresh(new_book)
     return new_book
 
 
-@router.put("/books/update", status_code=status.HTTP_204_NO_CONTENT)
-async def update_book(book: BookRequest, db: db_dependency, user: user_dependency):
-    query = db.query(Book).filter(getattr(Book, "id") == book.id)
+@router.put("/book/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def update_book(
+    db: db_dependency, user: user_dependency, book: BookRequest, id: int = Path(gt=0)
+):
+    query = db.query(Book).filter(
+        getattr(Book, "id") == id, Book.owner_id == user["id"]
+    )
     book_to_update = query.first()
     if book_to_update:
         for key, value in book.model_dump().items():
@@ -167,7 +170,7 @@ async def update_book(book: BookRequest, db: db_dependency, user: user_dependenc
     raise HTTPException(status_code=404, detail="Item not found")
 
 
-@router.delete("/books/{pk}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/book/{pk}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_book(user: user_dependency, db: db_dependency, pk: int = Path(gt=0)):
     query = db.query(Book).filter(getattr(Book, "id") == pk)
     book_to_delete = query.first()
